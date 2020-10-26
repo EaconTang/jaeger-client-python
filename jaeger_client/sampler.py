@@ -29,6 +29,8 @@ from .constants import (
     SAMPLER_TYPE_RATE_LIMITING,
     SAMPLER_TYPE_LOWER_BOUND,
 )
+import opentracing
+
 from .metrics import Metrics, LegacyMetricsFactory
 from .utils import ErrorReporter
 from .rate_limiter import RateLimiter
@@ -121,7 +123,7 @@ class ProbabilisticSampler(Sampler):
         )
         assert 0.0 <= rate <= 1.0, 'Sampling rate must be between 0.0 and 1.0'
         self.rate = rate
-        self.max_number = 1 << _max_id_bits
+        self.max_number = 1 << opentracing.tracer.max_trace_id_bits
         self.boundary = rate * self.max_number
 
     def is_sampled(self, trace_id, operation=''):
